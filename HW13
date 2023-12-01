@@ -1,0 +1,69 @@
+#include <vector>
+#include <cstdlib>
+#include <iostream>
+#include <fstream>
+#include <Windows.h>
+
+using namespace std;
+
+vector<int> insertPackets(vector<int>& queue, int k, int& lost) {
+    int capacity = 100;
+    if (capacity < queue.size() + k) {
+        lost += queue.size() + k - capacity;
+        k = capacity - queue.size();
+    }
+    for (int i = 0; i < k; i++) {
+        queue.push_back(rand() % 20);
+    }
+    return queue;
+}
+
+vector<int> removePackets(vector<int>& queue, int n) {
+    for (int i = 0; i < n; i++) {
+        if (queue.size() != 0) {
+            queue.erase(queue.begin());
+        }
+    }
+    return queue;
+}
+
+int main() {
+    int NI = 7, NO = 15, ni, no, lost = 0;
+    vector <int> queue;
+    int NofPackets[120];
+
+    for (int itime = 0; itime < 120; itime++) {
+        Sleep(1000);
+
+        ni = rand() % NI;
+        insertPackets(queue, ni, lost);
+
+        no = rand() % NO;
+        removePackets(queue, no);
+
+        NofPackets[itime] = queue.size();
+    }
+
+    int sum = 0, max = 0;
+    for (int i = 0; i < 120; i++) {
+        sum += NofPackets[i];
+        if (max < NofPackets[i]) max = NofPackets[i];
+    }
+    double avg = static_cast<double>(sum) / 120;
+
+    cout << "Average number of packets: " << avg << endl;
+    cout << "Maximum number of packets: " << max << endl;
+
+    ofstream outputFile("NofPackets.txt");
+    if (outputFile.is_open()) {
+        for (int i = 0; i < 120; i++) {
+            outputFile << NofPackets[i] << endl;
+        }
+        outputFile.close();
+    }
+    else {
+        cout << "Unable to open file";
+    }
+
+    return 123;
+}
